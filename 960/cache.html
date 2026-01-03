@@ -58,37 +58,66 @@
       </footer>
     </div>
   </body>
-  <script>
-    // Logging utility
-    const outputConsole = document.getElementById("console");
-    window.log = (msg, color="#cccccc") => { outputConsole.innerHTML += `<span style="color:${color}">${msg}</span><br>`; };
 
-    // Auto-run exploit when DOM is ready (same logic as index.html)
-    document.addEventListener('DOMContentLoaded', () => {
-      outputConsole.textContent = "";
-      try {
-        if (typeof doJBwithPSFreeLapseExploit === 'function') {
-          window.log('Starting automatic exploit (cached page)...', '#aaffaa');
-          doJBwithPSFreeLapseExploit();
+  <!-- Register the service worker (place this after the DOM or before inline script) -->
+  <script>
+    (function(){
+      const outputConsole = document.getElementById("console");
+      window.log = (msg, color="#cccccc") => {
+        if (outputConsole) {
+          outputConsole.innerHTML += `<span style="color:${color}">${msg}</span><br>`;
         } else {
-          window.log('Exploit function not available on load (cached page). Waiting for bundle...', 'orange');
-          let attempts = 0;
-          const maxAttempts = 20;
-          const id = setInterval(() => {
-            attempts++;
-            if (typeof doJBwithPSFreeLapseExploit === 'function') {
-              clearInterval(id);
-              window.log('Exploit function found — running now.', '#aaffaa');
-              try { doJBwithPSFreeLapseExploit(); } catch (e) { window.log('Error running exploit: ' + e, 'red'); }
-            } else if (attempts >= maxAttempts) {
-              clearInterval(id);
-              window.log('Exploit function did not appear after waiting.', 'orange');
-            }
-          }, 250);
+          console.log(msg);
         }
-      } catch (error) {
-        window.log("An error occured during exploit: " + error, "red");
+      };
+
+      // Service worker registration
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => {
+            window.log('Service Worker registered (scope: ' + reg.scope + ')', '#aaffaa');
+          })
+          .catch(err => {
+            window.log('Service Worker registration failed: ' + err, 'orange');
+          });
+      } else {
+        window.log('Service Worker not supported in this browser.', 'orange');
       }
-    });
+
+      // Auto-run exploit when DOM is ready (same logic as before),
+      // but more defensive and with clearer offline message.
+      document.addEventListener('DOMContentLoaded', () => {
+        // clear console display area (keeps SW messages visible)
+        if (outputConsole) outputConsole.textContent = "";
+        try {
+          if (typeof doJBwithPSFreeLapseExploit === 'function') {
+            window.log('Starting automatic exploit (cached page)...', '#aaffaa');
+            doJBwithPSFreeLapseExploit();
+          } else {
+            window.log('Exploit function not available on load (cached page). Waiting for bundle...', 'orange');
+            let attempts = 0;
+            const maxAttempts = 20;
+            const id = setInterval(() => {
+              attempts++;
+              if (typeof doJBwithPSFreeLapseExploit === 'function') {
+                clearInterval(id);
+                window.log('Exploit function found — running now.', '#aaffaa');
+                try { doJBwithPSFreeLapseExploit(); } catch (e) { window.log('Error running exploit: ' + e, 'red'); }
+              } else if (attempts >= maxAttempts) {
+                clearInterval(id);
+                if (!navigator.onLine) {
+                  window.log('Still offline — bundle.js not available and exploit could not be loaded.', 'orange');
+                  window.log('If you want the bundle available offline, make sure the service worker is installed and cached the bundle.', 'orange');
+                } else {
+                  window.log('Exploit function did not appear after waiting. Bundle might be missing or failed to run.', 'orange');
+                }
+              }
+            }, 250);
+          }
+        } catch (error) {
+          window.log("An error occured during exploit: " + error, "red");
+        }
+      });
+    })();
   </script>
 </html>
