@@ -1,91 +1,111 @@
-<html manifest="psfree_lapse.cache">
+<!DOCTYPE html>
+<html>
   <head>
-    <meta charset="utf-8"> 
-  </title>SHAKOM PS</title>
+    <meta charset="utf-8">
+    <title>SHAKOM PS - Cache</title>
+    <script src="./bundle.js"></script>
     <style>
+      html,body{height:100%;margin:0}
       body {
-        background:url('imgg.jpg');
-        background-color: #252526;
-        color: #cccccc;
-        font-family: "Segoe UI", Tahoma, sans-serif;
-        text-align: center;
+        /* centered background that scrolls with page */
+        background: url('./imgg.jpg') no-repeat center center;
+        background-size: cover;
+        background-color: #252526; /* fallback color if image fails */
+        font-family: sans-serif;
       }
       h2 {
         margin-bottom: 20px;
+        color: #ffffff;
+        text-align: center;
+        padding-top: 20px;
       }
       #console {
         font-family: monospace;
-        background-color: #1e1e1e;
+        background-color: rgba(30,30,30,0.85);
         color: #cccccc;
         border: 1px solid #3c3c3c;
         padding: 12px;
         border-radius: 6px;
-        margin-top: 20px;
+        margin: 20px auto;
         text-align: left;
+        max-width: 900px;
+        white-space: pre-wrap;
       }
       #jailbreakBtn {
-        margin-top: 20px;
+        display: block;
+        margin: 20px auto 0;
         padding: 12px 24px;
         font-size: 18px;
         font-weight: bold;
+        background: #007acc;
+        color: #fff;
         border: none;
         border-radius: 6px;
+        cursor: pointer;
+      }
+      #jailbreakBtn:disabled {
         background: #555555;
         color: #aaaaaa;
         cursor: not-allowed;
-        opacity: 0.7;
-        box-shadow: none;
+      }
+      #jailbreakBtn:not(:disabled):hover {
+        background: #005a9e;
       }
       footer {
         margin-top: 30px;
         font-size: 14px;
         color: #888;
+        text-align: center;
       }
     </style>
   </head>
-  
   <body>
-    <h2>SHAKOM PS</h2>
+    <h2>SHAKOM PS (Cache)</h2>
     <div>
-      <button id="اضغط هنا لتفعيل التعديل</button>
+      <button id="jailbreakBtn">اضغط هنا لتفعيل التعديل</button>
     </div>
     <pre id="console"></pre>
+
     <footer>
-      
+      <p>You are viewing the cached page.</p>
+      <p><a href="index.html" style="color:#aaa">Return to live page</a></p>
     </footer>
+
   </body>
   <script>
-    // Clear history and prevent back navigation
-    history.replaceState(null, null, 'index.html');
-    var histlength = history.length;
-    history.go(-histlength);
     // Logging utility
     const outputConsole = document.getElementById("console");
-    window.log = (msg) => { outputConsole.textContent += msg + "\n"; };
-    // Download progress (% display)
-    function DLProgress(e) {
-      const percent = (Math.round((e.loaded / e.total) * 100));
-      window.log(`[CACHE] Downloading... ${percent}% complete.`);
-    }
-    // On cache complete
-    function DisplayCacheProgress() {
-      window.log(" ");
-      window.log("[SUCCESS] Cache installed successfully.");
-      window.log("Page will reload in 3 seconds...");
-      // Delay to show success message before navigation
-      setTimeout(function() { window.log("Reloading..."); }, 2000);
-      // Navigate back to index.html to load the exploit from cache
-      setTimeout(function() { location.reload(); }, 3000);
-    }
-    // Event listeners
-    window.applicationCache.addEventListener("progress", DLProgress, false);
-    window.applicationCache.oncached = function(e) { DisplayCacheProgress(); };
-    window.applicationCache.onupdateready = function(e) { DisplayCacheProgress(); };
-    // Initialization message on DOM load
-    document.addEventListener('DOMContentLoaded', () => {
+    window.log = (msg, color="#cccccc") => { outputConsole.innerHTML += `<span style="color:${color}">${msg}</span><br>`; };
+    // Event definitions
+    addEventListener('unhandledrejection', event => {
+      const reason = event.reason;
+      alert(
+        'Unhandled rejection\n'
+        + `${reason}\n`
+        + `${reason.sourceURL}:${reason.line}:${reason.column}\n`
+        + `${reason.stack}`
+      );
+    });
+    addEventListener('error', event => {
+      const reason = event.error;
+      alert(
+        'Unhandled error\n'
+        + `${reason}\n`
+        + `${reason.sourceURL}:${reason.line}:${reason.column}\n`
+        + `${reason.stack}`
+      );
+      return true; // Used for not to show error message on console
+    });
+    // Button click
+    document.getElementById("jailbreakBtn").addEventListener("click", () => {
+      // Disable to prevent double click
+      document.getElementById("jailbreakBtn").disabled = true;
       outputConsole.textContent = ""; // Clear console log
-      window.log("AppCache download initiating...");
-      window.log("Please wait, this may take a few seconds.");
+      try {
+        doJBwithPSFreeLapseExploit();
+      } catch (error) {
+        window.log("An error occured during exploit: " + error, "red");
+      }
     });
   </script>
 </html>
