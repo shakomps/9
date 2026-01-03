@@ -1,32 +1,42 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-    <title></title>SHAKOM PS</title>
+    <title>SHAKOM PS</title>
     <script src="./bundle.js"></script>
     <style>
        html,body{height:100%;margin:0}
-    body{
-      background-color:#252526;
-      background-image: url('imgg.jpg');
-      background-repeat:no-repeat;
-      background-position:center center;
-      background-size:cover;
-      }
+       /* Use imgg.jpg as the page background */
+       html {
+         background: url('imgg.jpg') no-repeat center center fixed;
+         background-size: cover;
+       }
+       /* Optional semi-transparent overlay so content remains readable */
+       body{
+         background-color: rgba(37,37,38,0.55);
+         font-family: sans-serif;
+       }
       h2 {
         margin-bottom: 20px;
+        color: #ffffff;
+        text-align: center;
+        padding-top: 20px;
       }
       #console {
         font-family: monospace;
-        background-color: #1e1e1e;
+        background-color: rgba(30,30,30,0.85);
         color: #cccccc;
         border: 1px solid #3c3c3c;
         padding: 12px;
         border-radius: 6px;
-        margin-top: 20px;
+        margin: 20px auto;
         text-align: left;
+        max-width: 900px;
+        white-space: pre-wrap;
       }
       #jailbreakBtn {
-        margin-top: 20px;
+        display: block;
+        margin: 20px auto 0;
         padding: 12px 24px;
         font-size: 18px;
         font-weight: bold;
@@ -48,16 +58,17 @@
         margin-top: 30px;
         font-size: 14px;
         color: #888;
+        text-align: center;
       }
     </style>
     <script>
-      if ((window.applicationCache.status == '0') || (window.applicationCache.status == '3')) { // 0: UNCACHED, 3: IDLE
+      if ((window.applicationCache && (window.applicationCache.status == '0' || window.applicationCache.status == '3'))) { // 0: UNCACHED, 3: IDLE
         window.location.replace("cache.html");
       }
     </script>
   </head>
   <body>
-    <h2> SHAKOM PS</h2>
+    <h2>SHAKOM PS</h2>
     <div>
       <button id="jailbreakBtn">اضغط هنا لتفعيل التعديل</button>
     </div>
