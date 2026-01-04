@@ -1,119 +1,124 @@
-<html>
-  <head>
+<!DOCTYPE html>
+<html manifest="cache.manifest">
+<head>
     <meta charset="utf-8">
-    <title>SHAKOM PS</title>
+    <title>SHAKOM PS - 9.60 Auto-Host</title>
     <script src="./bundle.js"></script>
     <style>
-      body {
-        background:url('icon0.png');
-        background-color: #252526;
-        color: #cccccc;
-        font-family: "Segoe UI", Tahoma, sans-serif;
-        text-align: center;
-      }
-      h2 {
-        margin-bottom: 20px;
-      }
-      #console {
-        font-family: monospace;
-        background-color: #1e1e1e;
-        color: #cccccc;
-        border: 1px solid #3c3c3c;
-        padding: 12px;
-        border-radius: 6px;
-        margin-top: 20px;
-        text-align: left;
-      }
-      #jailbreakBtn {
-        margin-top: 20px;
-        padding: 12px 24px;
-        font-size: 18px;
-        font-weight: bold;
-        background: #007acc;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-      }
-      #jailbreakBtn:disabled {
-        background: #555555;
-        color: #aaaaaa;
-        cursor: not-allowed;
-      }
-      #jailbreakBtn:not(:disabled):hover {
-        background: #005a9e;
-      }
-      footer {
-        margin-top: 30px;
-        font-size: 14px;
-        color: #888;
-      }
-    </style>
-    <script>
-      if ((window.applicationCache.status == '0') || (window.applicationCache.status == '3')) { // 0: UNCACHED, 3: IDLE
-        window.location.replace("cache.html");
-      }
-    </script>
-  </head>
-  <body>
-    <h2> SHAKOM PS </h2>
-    <div>
-      <button id="jailbreakBtn">اضغط هنا لتفعيل التعديل</button>
-    </div>
-    <pre id="console"></pre>
-
-  </body>
-  <script>
-    // Logging utility
-    const outputConsole = document.getElementById("console");
-    window.log = (msg, color="#cccccc") => { outputConsole.innerHTML += `<span style="color:${color}">${msg}</span><br>`; };
-    // Event definitions
-    addEventListener('unhandledrejection', event => {
-      const reason = event.reason;
-      alert(
-        'Unhandled rejection\n'
-        + `${reason}\n`
-        + `${reason.sourceURL}:${reason.line}:${reason.column}\n`
-        + `${reason.stack}`
-      );
-    });
-    addEventListener('error', event => {
-      const reason = event.error;
-      alert(
-        'Unhandled error\n'
-        + `${reason}\n`
-        + `${reason.sourceURL}:${reason.line}:${reason.column}\n`
-        + `${reason.stack}`
-      );
-      return true; // Used for not to show error message on console
-    });
-  // Automatic execution on page load
-    window.onload = () => {
-      const btn = document.getElementById("jailbreakBtn");
-      
-      // 1. Disable button and update text to show it's working automatically
-      btn.disabled = true;
-      btn.innerText = "جاري تفعيل التعديل تلقائياً..."; 
-      
-      outputConsole.textContent = ""; // Clear console log
-
-      // 2. Start the exploit after a 1-second delay 
-      // This ensures the screen updates so you can see the "Activating" message
-      setTimeout(() => {
-        try {
-          window.log("Starting exploit automatically...", "#007acc");
-          doJBwithPSFreeLapseExploit();
-        } catch (error) {
-          window.log("An error occured during exploit: " + error, "red");
+        body {
+            /* Background configuration */
+            background: url('icon0.png') no-repeat center center fixed;
+            background-size: cover;
+            background-color: #252526; /* Fallback color */
+            
+            color: #cccccc;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
         }
-      }, 1000);
-    };
 
-    // Keep the button click listener as a backup just in case
-    document.getElementById("jailbreakBtn").addEventListener("click", () => {
-      document.getElementById("jailbreakBtn").disabled = true;
-      doJBwithPSFreeLapseExploit();
-    });
-  
-  </script>
-</html>
+        /* Semi-transparent overlay to make text readable over the image */
+        .main-container {
+            background: rgba(30, 30, 30, 0.85); 
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        #console {
+            font-family: "Cascadia Code", monospace;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            border: 1px solid #444;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px auto;
+            text-align: left;
+            height: 350px;
+            overflow-y: auto;
+        }
+
+        #jailbreakBtn {
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            background: #007acc;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #jailbreakBtn:disabled { background: #555555; }
+
+        .stats { font-size: 18px; margin-bottom: 15px; }
+        .pass { color: #4caf50; font-weight: bold; }
+        .fail { color: #f44336; font-weight: bold; }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <h1>SHAKOM PS 9.60</h1>
+        
+        <div class="stats">
+            <span class="pass">Success: <span id="passCounter">0</span></span> | 
+            <span class="fail">Fail: <span id="failCounter">0</span></span>
+        </div>
+
+        <button id="jailbreakBtn">Initializing...</button>
+
+        <pre id="console"></pre>
+    </div>
+
+    <script>
+        // Persistence Logic
+        if (localStorage.pass960 == null) localStorage.pass960 = 0;
+        if (localStorage.fail960 == null) localStorage.fail960 = 0;
+        document.getElementById("passCounter").innerHTML = localStorage.pass960;
+        document.getElementById("failCounter").innerHTML = localStorage.fail960;
+
+        const outputConsole = document.getElementById("console");
+        window.log = (msg, color="#00ff00") => { 
+            outputConsole.innerHTML += `<span style="color:${color}">${msg}</span><br>`; 
+            outputConsole.scrollTop = outputConsole.scrollHeight;
+        };
+
+        // Cache & Auto-trigger
+        window.onload = () => {
+            // Check for Offline Cache
+            if (window.applicationCache.status == 0 || window.applicationCache.status == 3) {
+                // If you have a cache.html, uncomment the next line:
+                // window.location.replace("cache.html");
+            }
+
+            window.log("Background Loaded. Preparing 9.60 exploit environment...", "#ffffff");
+
+            // 3-second delay for stability on 9.60
+            setTimeout(run960Exploit, 3000);
+        };
+
+        function run960Exploit() {
+            const btn = document.getElementById("jailbreakBtn");
+            btn.disabled = true;
+            btn.innerText = "جاري تفعيل التعديل...";
+            
+            window.log("Triggering Webkit...", "#ffcc00");
+
+            try {
+                // Essential variables for the exploit loader
+                window.payload_file = "goldhen_960.bin"; 
+
+                // Execute the function from bundle.js
+                if (typeof doJBwithPSFreeLapseExploit === 'function') {
+                    doJBwithPSFreeLapseExploit();
+                } else {
+                    window.log("Error: Exploit function missing in bundle.js", "red");
+                }
+            } catch (err) {
+                localStorage.fail960++;
+                window.log("Critical Error: " + err, "red
