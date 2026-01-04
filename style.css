@@ -1,11 +1,12 @@
 html {
-    background:url('icon0.png');
-        background-color: #252526;
-        background-size: 92%;
-        color: #cccccc;
-        font-family: "Segoe UI", Tahoma, sans-serif;
-        text-align: center;
-}
+ background-image: url("img.jpg");
+background-size: 92%;
+background-repeat: no-repeat;
+background-color: #24272b;
+color: white;
+text-align: center;
+margin: 0px;
+overflow: hidden;
 
 h1 {
     text-shadow: 0.1em 0.1em 0.2em black;
@@ -99,6 +100,7 @@ a {
     background-color: #c2c2c2;
     color: #303030;
 }
+
 
 
 
