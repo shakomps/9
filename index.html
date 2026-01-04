@@ -23,7 +23,7 @@ function load_menu(){ document.getElementById("menu").style.display = "block"; d
 <script>
 (function(){
   if (!('serviceWorker' in navigator)) return;
-  const ASSETS = ['/index.html','/960/index.html','/960/cache.html','/960/bundle.js','/960/imgg.jpg','/style.css'];
+  const ASSETS = ['/index.html','/9/index.html','/9/cache.html','/9/bundle.js','/9/imgg.jpg','/style.css'];
   navigator.serviceWorker.register('/sw.js').then(reg => {
     console.log('Service worker registered at', reg.scope);
     // Proactively cache the main assets
