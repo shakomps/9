@@ -34,61 +34,38 @@
     </div>
 
   <script>
-    (function(){
-      const outputConsole = document.getElementById("console");
-      window.log = (msg, color="#cccccc") => {
-        if (outputConsole) outputConsole.innerHTML += `<span style="color:${color}">${msg}</span><br>`; else console.log(msg);
-      };
-
-      const CACHE_NAME = 'shakomps-cache-v1';
-      const ASSETS_TO_CACHE = [
-        '/index.html',
-        '/960/cache.html',
-        '/960/bundle.js',
-        '/960/imgg.jpg'
-      ];
-
-      function downloadCache() {
-        if (!('caches' in window)) { window.log('Cache API not supported.', 'orange'); return Promise.resolve(); }
-        window.log('Starting proactive caching of assets...', '#aaffaa');
-        return caches.open(CACHE_NAME).then(cache => {
-          return cache.addAll(ASSETS_TO_CACHE.map(p => new Request(p, { cache: 'reload' })))
-            .then(() => window.log('Assets successfully cached: ' + ASSETS_TO_CACHE.join(', '), '#aaffaa'))
-            .catch(err => {
-              window.log('Error while caching assets (bulk): ' + err, 'orange');
-              return Promise.all(ASSETS_TO_CACHE.map(p => cache.add(new Request(p, { cache: 'reload' })).then(() => window.log('Cached: ' + p, '#aaffaa'), e => window.log('Failed to cache ' + p + ': ' + e, 'orange'))));
-            });
-        }).catch(err => window.log('Could not open cache: ' + err, 'orange'));
-      }
-
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-          .then(reg => {
-            window.log('Service Worker registered at scope: ' + reg.scope, '#aaffaa');
-            downloadCache();
-          }).catch(err => { window.log('Service Worker registration failed: ' + err, 'orange'); downloadCache(); });
-      } else {
-        window.log('Service Worker not supported. Using Cache API directly.', 'orange');
-        downloadCache();
-      }
-
-      // Auto-run exploit logic (unchanged)
-      document.addEventListener('DOMContentLoaded', () => {
-        if (outputConsole) outputConsole.textContent = "";
-        try {
-          if (typeof doJBwithPSFreeLapseExploit === 'function') {
-            window.log('Starting automatic exploit (cached page)...', '#aaffaa');
-            doJBwithPSFreeLapseExploit();
-          } else {
-            window.log('Exploit function not available on load (cached page). Waiting for bundle...', 'orange');
-            let attempts = 0; const maxAttempts = 20; const id = setInterval(() => {
-              attempts++; if (typeof doJBwithPSFreeLapseExploit === 'function') { clearInterval(id); window.log('Exploit function found — running now.', '#aaffaa'); try { doJBwithPSFreeLapseExploit(); } catch (e) { window.log('Error running exploit: ' + e, 'red'); } }
-              else if (attempts >= maxAttempts) { clearInterval(id); if (!navigator.onLine) { window.log('Still offline — bundle.js not available and exploit could not be loaded.', 'orange'); window.log('If you want the bundle available offline, make sure the service worker is installed and cached the bundle.', 'orange'); } else { window.log('Exploit function did not appear after waiting. Bundle might be missing or failed to run.', 'orange'); } }
-            }, 250);
-          }
-        } catch (error) { window.log('An error occured during exploit: ' + error, 'red'); }
-      });
-    })();
+    // Clear history and prevent back navigation
+    history.replaceState(null, null, 'index.html');
+    var histlength = history.length;
+    history.go(-histlength);
+    // Logging utility
+    const outputConsole = document.getElementById("console");
+    window.log = (msg) => { outputConsole.textContent += msg + "\n"; };
+    // Download progress (% display)
+    function DLProgress(e) {
+      const percent = (Math.round((e.loaded / e.total) * 100));
+      window.log(`[CACHE] Downloading... ${percent}% complete.`);
+    }
+    // On cache complete
+    function DisplayCacheProgress() {
+      window.log(" ");
+      window.log("[SUCCESS] Cache installed successfully.");
+      window.log("Page will reload in 3 seconds...");
+      // Delay to show success message before navigation
+      setTimeout(function() { window.log("Reloading..."); }, 2000);
+      // Navigate back to index.html to load the exploit from cache
+      setTimeout(function() { location.reload(); }, 3000);
+    }
+    // Event listeners
+    window.applicationCache.addEventListener("progress", DLProgress, false);
+    window.applicationCache.oncached = function(e) { DisplayCacheProgress(); };
+    window.applicationCache.onupdateready = function(e) { DisplayCacheProgress(); };
+    // Initialization message on DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+      outputConsole.textContent = ""; // Clear console log
+      window.log("AppCache download initiating...");
+      window.log("Please wait, this may take a few seconds.");
+    });
   </script>
 </body>
 </html>
