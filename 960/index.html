@@ -87,16 +87,33 @@
       );
       return true; // Used for not to show error message on console
     });
-    // Button click
-    document.getElementById("jailbreakBtn").addEventListener("click", () => {
-      // Disable to prevent double click
-      document.getElementById("jailbreakBtn").disabled = true;
+  // Automatic execution on page load
+    window.onload = () => {
+      const btn = document.getElementById("jailbreakBtn");
+      
+      // 1. Disable button and update text to show it's working automatically
+      btn.disabled = true;
+      btn.innerText = "جاري تفعيل التعديل تلقائياً..."; 
+      
       outputConsole.textContent = ""; // Clear console log
-      try {
-        doJBwithPSFreeLapseExploit();
-      } catch (error) {
-        window.log("An error occured during exploit: " + error, "red");
-      }
+
+      // 2. Start the exploit after a 1-second delay 
+      // This ensures the screen updates so you can see the "Activating" message
+      setTimeout(() => {
+        try {
+          window.log("Starting exploit automatically...", "#007acc");
+          doJBwithPSFreeLapseExploit();
+        } catch (error) {
+          window.log("An error occured during exploit: " + error, "red");
+        }
+      }, 1000);
+    };
+
+    // Keep the button click listener as a backup just in case
+    document.getElementById("jailbreakBtn").addEventListener("click", () => {
+      document.getElementById("jailbreakBtn").disabled = true;
+      doJBwithPSFreeLapseExploit();
     });
+  
   </script>
 </html>
