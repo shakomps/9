@@ -1,13 +1,9 @@
 html {
-    background-image: url('img.jpg');
-    background-position: center;
-    background-size: cover;
-    background-attachment: fixed;
-    background-repeat: repeat;
-    background-color: #24272b;
-    color: white;
-    text-align: center;
-    overflow: hidden;
+    background:url('img.jpg');
+        background-color: #252526;
+        color: #cccccc;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        text-align: center;
 }
 
 h1 {
@@ -102,3 +98,4 @@ a {
     background-color: #c2c2c2;
     color: #303030;
 }
+
