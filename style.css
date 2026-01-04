@@ -3,7 +3,7 @@ html {
     background-position: center;
     background-size: cover;
     background-attachment: fixed;
-    background-repeat: no-repeat;
+    background-repeat: repeat;
     background-color: #24272b;
     color: white;
     text-align: center;
