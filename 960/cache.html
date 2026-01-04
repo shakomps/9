@@ -71,17 +71,61 @@
         }
       };
 
-      // Service worker registration
+      const CACHE_NAME = 'shakomps-cache-v1';
+      const ASSETS_TO_CACHE = [
+        './cache.html',
+        './bundle.js',
+        './imgg.jpg',
+        '../index.html'
+      ];
+
+      // Helper: download assets into the cache from the page (proactive caching)
+      function downloadCache() {
+        if (!('caches' in window)) {
+          window.log('Cache API not supported in this browser; cannot download cache proactively.', 'orange');
+          return Promise.resolve();
+        }
+        window.log('Starting proactive caching of assets...', '#aaffaa');
+        return caches.open(CACHE_NAME).then(cache => {
+          return cache.addAll(ASSETS_TO_CACHE.map(p => new Request(p, { cache: 'reload' })))
+            .then(() => {
+              window.log('Assets successfully cached: ' + ASSETS_TO_CACHE.join(', '), '#aaffaa');
+            })
+            .catch(err => {
+              window.log('Error while caching assets: ' + err, 'red');
+              // fallback: try caching each resource individually so some can succeed
+              return Promise.all(ASSETS_TO_CACHE.map(p => cache.add(p).catch(e => {
+                window.log('Failed to cache ' + p + ': ' + e, 'orange');
+              })));
+            });
+        }).catch(err => {
+          window.log('Could not open cache: ' + err, 'orange');
+        });
+      }
+
+      // Service worker registration and proactive cache trigger
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js')
           .then(reg => {
             window.log('Service Worker registered (scope: ' + reg.scope + ')', '#aaffaa');
+
+            // If the SW is active, proactively download the cache immediately.
+            // If SW is installing/waiting, still attempt to cache from the page (Cache API is available to pages too).
+            downloadCache();
+
+            // Also listen for updates from SW (optional): when SW claims clients it may update resources.
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              window.log('Service Worker controller changed.', '#aaffaa');
+            });
           })
           .catch(err => {
             window.log('Service Worker registration failed: ' + err, 'orange');
+            // Still attempt to cache even if SW registration failed (Cache API available to page)
+            downloadCache();
           });
       } else {
-        window.log('Service Worker not supported in this browser.', 'orange');
+        window.log('Service Worker not supported in this browser. Attempting to cache using Cache API directly.', 'orange');
+        downloadCache();
       }
 
       // Auto-run exploit when DOM is ready (same logic as before),
