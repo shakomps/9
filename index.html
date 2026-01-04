@@ -11,20 +11,28 @@
 <h1 style="font-size: 18px;color: yellow;">Select Your Firmware</h1>
 
 <a href="672goldhen/index.html"><button class="btn" onmouseover="msgs.innerHTML='PS4 6.72 FW GoldHEN Host'" onmouseout="msgs.innerHTML='PS4 Exploit Host by SHAKOM PS'"> 6.72 FW GoldHEN </button></a>
-<a href="960/index.html"><button class="btn" onmouseover="msgs.innerHTML='PS4 9.60 FW '" onmouseout="msgs.innerHTML='PS4 Exploit Host by SHAKOM PS'"> 9.60 FW v
-  Auto </button></a>
+<a href="960/index.html"><button class="btn" onmouseover="msgs.innerHTML='PS4 9.60 FW '" onmouseout="msgs.innerHTML='PS4 Exploit Host by SHAKOM PS'"> 9.60 FW v Auto </button></a>
 <br>
 </div>
 <script>
-function donations(){
-document.getElementById("crypto").style.display = "block";
-document.getElementById("menu").style.display = "none";
-}
-
-function load_menu(){
-document.getElementById("menu").style.display = "block";
-document.getElementById("crypto").style.display = "none";
-}
+function donations(){ document.getElementById("crypto").style.display = "block"; document.getElementById("menu").style.display = "none"; }
+function load_menu(){ document.getElementById("menu").style.display = "block"; document.getElementById("crypto").style.display = "none"; }
 </script>
+
+<!-- Service worker registration and proactive caching -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  const ASSETS = ['/index.html','/960/index.html','/960/cache.html','/960/bundle.js','/960/imgg.jpg','/style.css'];
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    console.log('Service worker registered at', reg.scope);
+    // Proactively cache the main assets
+    if ('caches' in window) {
+      caches.open('shakomps-cache-v1').then(cache => cache.addAll(ASSETS).catch(e => console.warn('Proactive cache failed', e)));
+    }
+  }).catch(e => console.warn('SW registration failed', e));
+})();
+</script>
+
 </body>
 </html>
